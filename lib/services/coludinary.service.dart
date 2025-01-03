@@ -4,9 +4,8 @@ import 'package:crypto/crypto.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:filestorage/services/firestore.services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 Future<bool> uploadToCloudinary(FilePickerResult? fpr) async {
   if (fpr == null || fpr.files.isEmpty) {
@@ -88,48 +87,55 @@ Future<bool> deleteToCloudinary(String publicId) async {
   }
 }
 
-Future<bool> DownloadFileFromCloudnary(String url, String name) async {
-  try {
-    // Request storage permission
-    var status = await Permission.storage.request();
-    var manageStatus = await Permission.manageExternalStorage.request();
-    print(status);
-    print(manageStatus);
-    if (status == PermissionStatus.granted &&
-        manageStatus == PermissionStatus.granted) {
-      // The user has granted both permissions, so proceed
-      print("Storage permissions granted");
-    } else {
-      // The user has permanently denied one or both permissions, so open the settings
-      await openAppSettings();
-    }
-    // Directory appDocDir = await getApplicationDocumentsDirectory();
-
-    // // Alternatively, use the public Pictures directory
-    // Directory? picturesDir = await getExternalStorageDirectory();
-    // String filePath = picturesDir != null
-    //     ? '${picturesDir.path}/$name'
-    //     : '${appDocDir.path}/$name';
-    // Directory? downloadsDir = Directory('/storage/emulated/0/Download');
-    final Directory downloadsDir = await getApplicationDocumentsDirectory();
-
-    if (!downloadsDir.existsSync()) {
-      print("Download directory is not found");
-      return false;
-    }
-
-    String filePath = "${downloadsDir.path}/$name";
-    var response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      File file = File(filePath);
-      await file.writeAsBytes(response.bodyBytes);
-      print("File dowload successfully! saved at : $filePath");
-      return true;
-    } else {
-      return false;
-    }
-  } catch (e) {
-    print("Error dowloading file : $e");
-    return false;
+Future<bool> DownloadFileFromCloudnary(String url, String extention) async {
+  bool x = false;
+  if (extention == 'png' || extention == "jpg" || extention == "jepg") {
+    GallerySaver.saveImage(url, albumName: "IR Cloud").then((success) {
+      print(success);
+      // x = success;
+    });
+  } else {
+    GallerySaver.saveVideo(url, albumName: "IR Cloud").then((success) {
+      // x = success;
+    });
   }
+  return x;
 }
+// Future<bool> DownloadFileFromCloudnary(String url, String name) async {
+//   try {
+//     // Request storage permission
+//     // var status = await Permission.storage.request();
+//     // var manageStatus = await Permission.manageExternalStorage.request();
+//     // print(status);
+//     // print(manageStatus);
+//     // if (status == PermissionStatus.granted &&
+//     //     manageStatus == PermissionStatus.granted) {
+//     //   // The user has granted both permissions, so proceed
+//     //   print("Storage permissions granted");
+//     // } else {
+//     //   // The user has permanently denied one or both permissions, so open the settings
+//     //   await openAppSettings();
+
+//     Directory? downloadsDir = Directory('/storage/emulated/0/Download');
+//     // final Directory downloadsDir = await getApplicationDocumentsDirectory();
+
+//     if (!downloadsDir.existsSync()) {
+//       print("Download directory is not found");
+//       return false;
+//     }
+
+//     String filePath = "${downloadsDir.path}/$name";
+//     var response = await http.get(Uri.parse(url));
+//     if (response.statusCode == 200) {
+//       File file = File(filePath);
+//       await file.writeAsBytes(response.bodyBytes);
+//       print("File dowload successfully! saved at : $filePath");
+//       return true;
+//     } else {
+//       return false;
+//     }
+//   } catch (e) {
+//     print("Error dowloading file : $e");
+//     return false;
+//   }
+// }

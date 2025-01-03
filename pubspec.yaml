@@ -50,10 +50,19 @@ dependencies:
   path_provider: ^2.1.5
   permission_handler: ^11.3.1
   flutter_launcher_icons: ^0.14.2
+  gallery_saver_plus: ^3.2.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_icon: true
+  image_path: "assets/image/icon.png"
+  adaptive_icon_background: "#fff"
+  adaptive_icon_foreground: "assets/image/icon.png"
 
 
   # The "flutter_lints" package below contains a set of recommended lints to
