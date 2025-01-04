@@ -176,7 +176,7 @@ class _HomePageState extends State<HomePage> {
                                         final res =
                                             await DownloadFileFromCloudnary(
                                                 url, extention);
-                                        if (res) {
+                                        if (res == true) {
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(SnackBar(
                                                   content: Text(
