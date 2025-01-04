@@ -3,7 +3,9 @@ import 'package:video_player/video_player.dart';
 
 class PreviewVideo extends StatefulWidget {
   final String url;
-  const PreviewVideo({super.key, required this.url});
+  final String name;
+
+  const PreviewVideo({super.key, required this.url, required this.name});
 
   @override
   State<PreviewVideo> createState() => _PreviewVideoState();
@@ -23,8 +25,11 @@ class _PreviewVideoState extends State<PreviewVideo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black26,
       appBar: AppBar(
-        title: Text("Preview Video"),
+        title: Text(widget.name, style: TextStyle(color: Colors.grey)),
+        backgroundColor: Colors.black26,
+        foregroundColor: Colors.grey,
       ),
       body: Center(
         child: _controller.value.isInitialized
@@ -42,8 +47,10 @@ class _PreviewVideoState extends State<PreviewVideo> {
                 : _controller.play();
           });
         },
-        child:
-            Icon(_controller.value.isPlaying ? Icons.pause : Icons.play_arrow),
+        child: Icon(
+          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+          color: Colors.grey,
+        ),
       ),
     );
   }

@@ -1,8 +1,8 @@
 import 'package:file_picker/file_picker.dart';
+import 'package:filestorage/component/bottom_sheet.dart';
 import 'package:filestorage/component/preview_image.component.dart';
 import 'package:filestorage/component/preview_video.component.dart';
 import 'package:filestorage/services/auth.service.dart';
-import 'package:filestorage/services/coludinary.service.dart';
 import 'package:filestorage/services/firestore.services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -69,49 +69,6 @@ class _HomePageState extends State<HomePage> {
                     String url = userUploadedFiles[index]['url'];
 
                     return GestureDetector(
-                      onLongPress: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                                  title: Text("Delete file"),
-                                  content:
-                                      Text("Are you sure you want to delete?"),
-                                  actions: [
-                                    TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text("Cancel")),
-                                    TextButton(
-                                        onPressed: () async {
-                                          final bool res =
-                                              await FirestoreServices()
-                                                  .deleteFile(
-                                                      snapshot
-                                                          .data!.docs[index].id,
-                                                      id);
-                                          if (res) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(SnackBar(
-                                                    content:
-                                                        Text("File Delete")));
-                                          } else {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(SnackBar(
-                                              content: Text(
-                                                "File not deleted",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              backgroundColor: Colors.red,
-                                            ));
-                                          }
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text("Delete"))
-                                  ],
-                                ));
-                      },
                       onTap: () {
                         if (extention == 'png' ||
                             extention == "jpg" ||
@@ -119,14 +76,18 @@ class _HomePageState extends State<HomePage> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      PreviewImage(url: url)));
+                                  builder: (context) => PreviewImage(
+                                        url: url,
+                                        name: name,
+                                      )));
                         } else {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      PreviewVideo(url: url)));
+                                  builder: (context) => PreviewVideo(
+                                        url: url,
+                                        name: name,
+                                      )));
                         }
                       },
                       child: Container(
@@ -173,27 +134,28 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   IconButton(
                                       onPressed: () async {
-                                        final res =
-                                            await DownloadFileFromCloudnary(
-                                                url, extention);
-                                        if (res == true) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(SnackBar(
-                                                  content: Text(
-                                                      "File download successfully!")));
-                                        } else {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(SnackBar(
-                                            content: Text(
-                                              "Error in file download",
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                            backgroundColor: Colors.red,
-                                          ));
-                                        }
+                                        showModalBottomSheet(
+                                            context: context,
+                                            barrierColor:
+                                                Colors.black38.withOpacity(0.5),
+                                            backgroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.vertical(
+                                                        top: Radius.circular(
+                                                            15))),
+                                            builder: (context) =>
+                                                ShowBottomSheet(
+                                                  url: url,
+                                                  name: name,
+                                                  ext: extention,
+                                                  docId: snapshot
+                                                      .data!.docs[index].id,
+                                                  id: id,
+                                                ));
+                                        //
                                       },
-                                      icon: Icon(Icons.download))
+                                      icon: Icon(Icons.more_vert))
                                 ],
                               ),
                             ),
@@ -228,4 +190,16 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  // Future<void> _BottomSheetShow(BuildContext context) async {
+  //   return showModalBottomSheet(
+  //       context: context,
+  //       barrierColor: Colors.black38.withOpacity(0.5),
+  //       backgroundColor: Colors.blueGrey[100],
+  //       shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.vertical(top: Radius.circular(15))),
+  //       builder: (context) => Container(
+  //             height: 500,
+  //           ));
+  // }
 }
