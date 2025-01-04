@@ -1,16 +1,14 @@
-import 'dart:convert';
 import 'dart:io';
-
+import 'package:filestorage/component/preview_image.component.dart';
+import 'package:filestorage/component/preview_video.component.dart';
 import 'package:filestorage/services/coludinary.service.dart';
 import 'package:filestorage/services/firestore.services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
-// import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
-// import 'dart:typed_data';
 
 class ShowBottomSheet extends StatefulWidget {
   final String url;
@@ -154,6 +152,22 @@ class _ShowBottomSheetState extends State<ShowBottomSheet> {
                     if (await canLaunchUrl(uri)) {
                       await launchUrl(uri,
                           mode: LaunchMode.externalApplication);
+                    } else {
+                      if (widget.ext == 'png' ||
+                          widget.ext == "jpg" ||
+                          widget.ext == "jepg") {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PreviewImage(
+                                    url: widget.url, name: widget.name)));
+                      } else {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PreviewVideo(
+                                    url: widget.url, name: widget.name)));
+                      }
                     }
                   },
                   child: Row(
@@ -221,52 +235,6 @@ class _ShowBottomSheetState extends State<ShowBottomSheet> {
                       ),
                     ],
                   )),
-              widget.ext == 'png' || widget.ext == "jpg" || widget.ext == "jepg"
-                  ? TextButton(
-                      onPressed: () async {
-                        try {
-                          // Fetch the image data
-                          final response =
-                              await http.get(Uri.parse(widget.url));
-                          if (response.statusCode == 200) {
-                            // Encode as Base64 string
-                            final base64Image =
-                                base64Encode(response.bodyBytes);
-
-                            // Copy Base64 string to clipboard
-                            await Clipboard.setData(
-                                ClipboardData(text: base64Image));
-                            print(
-                                'Image copied to clipboard as Base64 string!');
-                          } else {
-                            throw Exception('Failed to fetch image');
-                          }
-                        } catch (e) {
-                          print('Error copying image to clipboard: $e');
-                        }
-                      },
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.file_copy_outlined,
-                            color: Colors.black,
-                            size: 20,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            "Copy a image",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400),
-                          )
-                        ],
-                      ))
-                  : SizedBox(
-                      height: 0,
-                    ),
               TextButton(
                   onPressed: () async {
                     showDialog(
@@ -288,6 +256,7 @@ class _ShowBottomSheetState extends State<ShowBottomSheet> {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(SnackBar(
                                                 content: Text("File Delete")));
+                                        Navigator.pop(context);
                                       } else {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(SnackBar(

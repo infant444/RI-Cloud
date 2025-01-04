@@ -62,7 +62,7 @@ class _LoginState extends State<Login> {
                     child: TextFormField(
                       obscureText: _PasswordVisible,
                       controller: _passwordController,
-                      validator: (value) => value!.length < 8
+                      validator: (value) => value!.length < 6
                           ? "Password can be atleast 8 character"
                           : null,
                       decoration: InputDecoration(
